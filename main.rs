@@ -50,6 +50,7 @@ impl STACModel for STAC {
     self.trained = TaskState::pending;
     // Iterate until deemed complete by STAC::training_iteration
     while self.trained == TaskState::pending {
+      // Need to pass on eta, it is not a property
       self.training_iteration(eta: u32); // Call STAC::training_iteration
     };
     // Return Trained unit struct, to represent completion
