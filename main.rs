@@ -5,7 +5,7 @@ fn main() {
 pub trait STACModel {
   // Trains the STAC model
   // Training must be a method that takes the eta hyperparameter
-  // Training must return the Trained unit struct
+  // Training must return the Some(Trained) or None if it fails
   // Its work is stored in the self.result vector of cluster IDs
   fn train(&mut self, eta: u32) -> Trained,
   // Checks if a and b are in the same cluster
@@ -14,7 +14,7 @@ pub trait STACModel {
   // Its work is stored in the return, and must not mutate self
   // Note that a and b are Vec<bool> not BooleanSpacePoint
   // This is because we do not use label information
-  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<connectEnum>
+  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<ConnectEnum>
 }
 
 pub struct STAC {
@@ -45,9 +45,12 @@ impl STAC {
 // Trait functions, see STACModel
 impl STACModel for STAC {
   // The train function, see STACModel
-  fn train(&mut self, eta: u32) -> Trained {
+  fn train(&mut self, eta: u32) -> option<Trained> {
     // Check that self.trained is TaskState::ready
-    assert!(self.trained == TaskState::ready);
+    let result_return
+    if self.trained != TaskState::ready {
+      return None // Return None
+    }
     // Set that the train task is pending
     self.trained = TaskState::pending;
     // Iterate until deemed complete by STAC::training_iteration
@@ -55,15 +58,48 @@ impl STACModel for STAC {
       // Need to pass on eta, it is not a property
       self.training_iteration(eta: u32); // Call STAC::training_iteration
     };
-    // Return Trained unit struct, to represent completion
+    // Return Some of the Trained unit struct, to represent completion
     // Note that the STAC::trained property is set to TaskState::done
     // This is done by the STAC::training_iteration method
-    Trained
+    return Some(Trained)
   }
   
   // The same_cluster function, see STACModel
-  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> bool {
-    
+  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<ConnectEnum> {
+    // Locate a in self.data, and get the index
+    let a_index = self.data
+      .iter() // Convert to iterator
+      .position(|&x| {x.to_vec() == a}) // Get the position of a
+      .unwrap(); // Assert it exists
+    // Locate b in self.data, and get the index
+    let b_index = self.data
+      .iter() // Convert to iterator
+      .position(|&x| {x.to_vec() == b}) // Get the position of b
+      .unwrap(); // Assert it exists
+    // Get the cluster ID of a
+    let a_cluster_id = match a_index {
+      Some(index) => self.result[index],
+      None => None
+    };
+    // Get the cluster ID of b
+    let b_cluster_id = match b_index {
+      Some(index) => self.result[index],
+      None => None
+    };
+    // Check the cluster IDs, and see if they are equivalent
+    let same_cluster_boolean = match a_cluster_id {
+      Some(a_cluster_id) => match b_cluster_id {
+        Some(b_cluster_id) => Some(a_cluster_id == b_cluster_id),
+        None => None
+      },
+      None => None
+    }
+    // Convert the option<bool> to option<ConnectEnum>
+    match same_cluster_boolean {
+      Some(true) => Some(ConnectEnum::linked),
+      Some(false) => Some(ConnectEnum::seperate),
+      None => None
+    }
   }
 }
 
