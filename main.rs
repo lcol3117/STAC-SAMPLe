@@ -7,14 +7,20 @@ pub trait STACModel {
   // Training must be a method that takes the eta hyperparameter
   // Training must return the Some(Trained) or None if it fails
   // Its work is stored in the self.result vector of cluster IDs
-  fn train(&mut self, eta: u32) -> Trained,
+  fn train(&mut self, eta: u32) -> option<Trained>,
   // Checks if a and b are in the same cluster
   // Takes a and b (points in a boolean space) as Vectors of booleans
   // Returns Some(ConnectEnum) if self.trained is DoneEnum::done, otherwise None
   // Its work is stored in the return, and must not mutate self
   // Note that a and b are Vec<bool> not BooleanSpacePoint
   // This is because we do not use label information
-  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<ConnectEnum>
+  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<ConnectEnum>,
+  // This is used to update the STAC.data value
+  // Do not do this directly
+  // This will automatically await the STAC.trained TaskState
+  // It will also set the STAC.trained TaskState
+  // Note that it calls STAC::new, and then passes on the fields
+  fn update_data(&mut self, new_data: Vec<BooleanSpacePoint>)
 }
 
 pub struct STAC {
