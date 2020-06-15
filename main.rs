@@ -12,6 +12,8 @@ pub trait STACModel {
   // Takes a and b (points in a boolean space) as Vectors of booleans
   // Returns Some(ConnectEnum) if self.trained is DoneEnum::done, otherwise None
   // Its work is stored in the return, and must not mutate self
+  // Note that a and b are Vec<bool> not BooleanSpacePoint
+  // This is because we do not use label information
   fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<connectEnum>
 }
 
@@ -57,6 +59,11 @@ impl STACModel for STAC {
     // Note that the STAC::trained property is set to TaskState::done
     // This is done by the STAC::training_iteration method
     Trained
+  }
+  
+  // The same_cluster function, see STACModel
+  fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> bool {
+    
   }
 }
 
