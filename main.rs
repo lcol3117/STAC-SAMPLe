@@ -88,17 +88,18 @@ impl STACModel for STAC {
     };
     // Check the cluster IDs, and see if they are equivalent
     let same_cluster_boolean = match a_cluster_id {
+      // If a_cluster_id is not None, check b_cluster_id
       Some(a_cluster_id) => match b_cluster_id {
         Some(b_cluster_id) => Some(a_cluster_id == b_cluster_id),
-        None => None
+        None => None // Carry the None
       },
-      None => None
+      None => None // Carry the None
     }
     // Convert the option<bool> to option<ConnectEnum>
     match same_cluster_boolean {
-      Some(true) => Some(ConnectEnum::linked),
-      Some(false) => Some(ConnectEnum::seperate),
-      None => None
+      Some(true) => Some(ConnectEnum::linked), // Same cluster
+      Some(false) => Some(ConnectEnum::seperate), // Different cluster
+      None => None // Something went wrong
     }
   }
 }
