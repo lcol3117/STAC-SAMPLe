@@ -52,7 +52,9 @@ impl STACModel for STAC {
     while self.trained == TaskState::pending {
       self.training_iteration(eta: u32);
     };
-    // Return Trained unit struct
+    // Return Trained unit struct, to represent completion
+    // Note that the STAC::trained property is set to TaskState::done
+    // This is done by the STAC::training_iteration method
     Trained
   }
 }
