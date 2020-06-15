@@ -43,12 +43,17 @@ impl STAC {
 // Trait functions, see STACModel
 impl STACModel for STAC {
   // The train function, see STACModel
-  fn train(&mut self, eta: u32) -> option<Trained> {
+  fn train(&mut self, eta: u32) -> Trained {
     // Check that self.trained is TaskState::ready
     assert!(self.trained == TaskState::ready);
     // Set that the train task is pending
     self.trained = TaskState::pending;
-    while self.trained
+    // Iterate until deemed complete by STAC::training_iteration
+    while self.trained == TaskState::pending {
+      self.training_iteration(eta: u32);
+    };
+    // Return Trained unit struct
+    Trained
   }
 }
 
