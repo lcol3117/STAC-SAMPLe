@@ -58,7 +58,11 @@ struct BooleanSpacePoint {
   label: option<LabelEnum> // Some(LabelEnum) if labeles, otherwise None
 }
 
-// 
+// Represent the labels used in SAMPLe
+enum LabelEnum {
+  malware, // Malicious packages
+  accept // Acceptable packages
+}
 
 // Represent the state of a task
 enum TaskState {
