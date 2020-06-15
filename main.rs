@@ -100,13 +100,30 @@ impl STACModel for STAC {
         None => None // Carry the None
       },
       None => None // Carry the None
-    }
+    };
     // Convert the option<bool> to option<ConnectEnum>
     match same_cluster_boolean {
       Some(true) => Some(ConnectEnum::linked), // Same cluster
       Some(false) => Some(ConnectEnum::seperate), // Different cluster
       None => None // Something went wrong
     }
+  }
+  
+  // The update_data function, see STACModel
+  fn update_data(&mut self, newdata: Vec<BooleanSpacePoint>) {
+    // Await the self.trained TaskState to be not pending
+    while self.trained == TaskState::pending {};
+    // Set the self.trained TaskState to be pending
+    self.trained = TaskState::pending;
+    // Generate a new STAC object with the desired fields
+    let new_STAC_object = STAC::new(newdata);
+    // Update the data field
+    self.data = new_STAC_object.data;
+    // Update the result field
+    self.result = new_STAC_object.result;
+    // Set self.trained TaskState to ready
+    self.trained = TaskState::ready;
+    // Implicitly return unit
   }
 }
 
