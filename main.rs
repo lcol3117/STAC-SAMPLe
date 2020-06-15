@@ -116,6 +116,14 @@ enum LabelEnum {
   accept // Acceptable packages
 }
 
+// Implement copy and clone traits for LabelEnum
+impl Copy for LabelEnum {}
+impl Clone for LabelEnum {
+  fn clone(&self) -> self {
+    *self // Just return the enum value itself
+  }
+}
+
 // Represent the state of a task
 enum TaskState {
   done, // The task is complete
@@ -123,7 +131,7 @@ enum TaskState {
   pending // The task is currently running
 }
 
-// Implement copy and clone traits
+// Implement copy and clone traits for TaskState
 impl Copy for TaskState {}
 impl Clone for TaskState {
   fn clone(&self) -> self {
@@ -135,6 +143,14 @@ impl Clone for TaskState {
 enum ConnectEnum {
   linked, // The points are linked, in the same cluster
   seperate // The points are in seperate clusters
+}
+
+// Implement copy and clone traits for ConnectEnum
+impl Copy for ConnectEnum {}
+impl Clone for ConnectEnum {
+  fn clone(&self) -> self {
+    *self // Just return the enum value itself
+  }
 }
 
 struct Trained; // Unit struct, used to represent training attempt is complete
