@@ -1,5 +1,5 @@
 fn main() {
-  println!("Hello World!");
+  //TODO
 }
 
 pub trait STACModel {
@@ -124,6 +124,14 @@ impl STACModel for STAC {
     // Set self.trained TaskState to ready
     self.trained = TaskState::ready;
     // Implicitly return unit
+  }
+}
+
+// Internal training methods, see STAC::train
+impl STAC {
+  // Training iteration, called by STAC::train, an impl of STACModel trait
+  fn training_iteration(&mut self, eta: u32) {
+    // TODO
   }
 }
 
