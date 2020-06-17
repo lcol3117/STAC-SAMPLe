@@ -163,10 +163,17 @@ impl STAC {
         x.1 // Access the second index (the u64) of the tuple (Vec<bool>, u64)
       })
       .collect::<Vec<u64>>(); // Iterator<u64> -> Vec<u64>, used turbofish
+    // Calculate the minimum of dists
     let min_dist = dists
       .iter() // -> Iterator<u64>
-      .fold(|a, x| { // u64 implements the Copy trait, so no need for reference
+      .fold(u64::MAX, |a, x| { // u64 implements the Copy trait, so no reference
         if x < a {x} else {a} // Choose the minimum of either u64
+      });
+    // Get another minimum, that is not min_dist
+    let min_dist_alt = dists
+      .iter() // -> Iterator<u64>
+      .fold(u64::MAX, |a, x| { // Same as before, impl Copy => no reference
+        if x < a {if x == min_dist {a} else {x}} else {a} // Second to minimum
       });
     // Find the index of the closest pair, i.e. the pair with minimum distance
     let closest_index = dists
@@ -178,6 +185,23 @@ impl STAC {
     let datapoint_a = self.data[closest_index];
     // And then the other datapoint, as the Vec<bool> entry of the right tuple
     let datapoint_b = closest_vec[closest_index].0;
+    // See if this connects two labeled boolean space points of the same label
+    let merged_different = self.check_merging_labels(datapoint_a, datapoint_b);
+    // Match against the returned ConnectEnum
+    match merged_different {
+      // If they do not merge equivalent labels, connect them
+      ConnectEnum::seperate => self.connect_points(datapoint_a, datapoint_b),
+      // Otherwise, check eta to see if we can try again
+      ConnectEnum::linked => {
+        if eta != 0 {
+          // Update attempted_failed
+          self.attempted_failed.push(NewLink<Vec<bool>> {
+            inital: datapoint_a.clone().to_vec(),
+            resolve: datapoint_b.clone().to_vec()
+          })
+        }
+      }
+    }
   }
 }
 
