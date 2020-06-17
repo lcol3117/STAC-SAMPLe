@@ -144,6 +144,16 @@ impl STAC {
   // Training iteration, called by STAC::train, an impl of STACModel trait
   fn training_iteration(&mut self, eta: u32) {
     //TODO
+    // Set the current job state to pending
+    self.result.job = TaskState::pending;
+    // Map each datapoint to the distance to the closest other in boolean space
+    let dists = self.data
+      .iter() // Convert to iterable
+      .map(|&x| {
+        // Returns a tuple of (point: Vec<bool>, distance: u64)
+        Distance::closest_boolean_space(x.clone().to_vec(), self.data)
+      })
+      .collect::<Vec<(Vec<bool>, u64)>>(); // Iterator<_> -> Vec<_>
   }
 }
 
