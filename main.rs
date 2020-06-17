@@ -154,9 +154,8 @@ impl STAC {
     let closest_vec = self.data_not_clustered
       .iter() // Convert to iterable
       .map(|&x| {
-        
         // Returns a tuple of (point: Vec<bool>, distance: u64)
-        Distance::closest_boolean_space(x.clone().to_vec(), self.data)
+        let initial = self.closest_seperate_clusters(x.clone().to_vec(), self.data);
       })
       .collect::<Vec<(Vec<bool>, u64)>>(); // Iterator<_> -> Vec<_>
     // Make a new vector of just the distance (u64) of the tuple
