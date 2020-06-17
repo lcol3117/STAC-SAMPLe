@@ -12,7 +12,7 @@ pub trait STACModel {
   // Takes a and b (points in a boolean space) as Vectors of booleans
   // Returns Some(ConnectEnum) if self.trained is DoneEnum::done, otherwise None
   // Its work is stored in the return, and must not mutate self
-  // Note that a and b are Vec<bool> not BooleanSpacePoint
+  // Note that a and b are Vec<bool> not LabelBoolPoint
   // This is because we do not use label information
   fn same_cluster(&self, a: Vec<bool>, b: Vec<bool>) -> option<ConnectEnum>,
   // This is used to update the STAC.data value
@@ -20,22 +20,22 @@ pub trait STACModel {
   // This will automatically await the STAC.trained TaskState
   // It will also set the STAC.trained TaskState
   // Note that it calls STAC::new, and then passes on the fields
-  fn update_data(&mut self, new_data: Vec<BooleanSpacePoint>)
+  fn update_data(&mut self, new_data: Vec<LabelBoolPoint>)
 }
 
 pub struct STAC {
-  // Vector of points in a boolean space, use BooleanSpacePoint struct
-  data: Vec<BooleanSpacePoint>,
+  // Vector of points in a boolean space, some labeled, use LabelBoolPoint struct
+  data: Vec<LabelBoolPoint>,
   // Job and Vector of cluster IDs
   result: VecJob<u32>,
-  // Is the training done, ready, or pending
-  trained: TaskState
+  // Internal use only, attempted to link, failed, but ternary allowed alternate link
+  attempted_failed: Vec<NewLink<Vec<bool>>>
 }
 
 // Constructor impl block
 impl STAC {
   // The constructor
-  fn new(given_data: Vec<BooleanSpacePoint>) -> self {
+  fn new(given_data: Vec<LabelBoolPoint>) -> self {
     // Generate the cluster IDs s.t. all points are seperate
     let intial_result = (0_u32..(data.len() as u32)) // Range<u32>
       .collect::<Vec<u32>>(); // Vec<u32>
@@ -110,7 +110,7 @@ impl STACModel for STAC {
   }
   
   // The update_data function, see STACModel
-  fn update_data(&mut self, newdata: Vec<BooleanSpacePoint>) {
+  fn update_data(&mut self, newdata: Vec<LabelBoolPoint>) {
     // Await the self.trained TaskState to be not pending
     while self.trained == TaskState::pending {};
     // Set the self.trained TaskState to be pending
@@ -136,7 +136,7 @@ impl STAC {
 }
 
 // Represent a potentially labeled point in boolean space
-struct BooleanSpacePoint {
+struct LabelBoolPoint {
   point: Vec<bool>, // The point itself
   label: option<LabelEnum> // Some(LabelEnum) if labeles, otherwise None
 }
