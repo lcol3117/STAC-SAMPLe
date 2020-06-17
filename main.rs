@@ -151,9 +151,10 @@ impl STAC {
     // Set the current job state to pending
     self.result.job = TaskState::pending;
     // Map each datapoint to the distance to the closest other in boolean space
-    let closest_vec = self.data
+    let closest_vec = self.data_not_clustered
       .iter() // Convert to iterable
       .map(|&x| {
+        
         // Returns a tuple of (point: Vec<bool>, distance: u64)
         Distance::closest_boolean_space(x.clone().to_vec(), self.data)
       })
