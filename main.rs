@@ -147,6 +147,12 @@ struct VecJob<T> {
   job: TaskState
 }
 
+// Represent a generic link replaced with another
+struct NewLink<T> {
+  initial: (T,T),
+  resolve: (T,T)
+}
+
 // Represent the labels used in SAMPLe
 enum LabelEnum {
   malware, // Malicious packages
