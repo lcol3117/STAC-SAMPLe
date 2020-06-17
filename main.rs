@@ -2,7 +2,14 @@ fn main() {
   //TODO
 }
 
-pub trait STACModel {
+trait STACModelConstructor {
+  // The constructor itself
+  // Takes the data to initialize with, a vector of labeled boolean space points
+  // Returns the new STAC object
+  fn new(given_data: Vec<LabelBoolPoint>) -> STAC
+}
+
+trait STACModel {
   // Trains the STAC model
   // Training must be a method that takes the eta hyperparameter
   // Training must return the Some(Trained) or None if it fails
@@ -23,17 +30,17 @@ pub trait STACModel {
   fn update_data(&mut self, new_data: Vec<LabelBoolPoint>)
 }
 
-pub struct STAC {
+struct STAC {
   // Vector of points in a boolean space, some labeled, use LabelBoolPoint struct
   data: Vec<LabelBoolPoint>,
   // Job and Vector of cluster IDs
   result: VecJob<option<u32>>,
-  // Internal use only, attempted to link, failed, but ternary allowed alternate link
+  // Internal, attempted to link, failed, but ternary allowed alternate link
   attempted_failed: Vec<NewLink<Vec<bool>>>
 }
 
 // Constructor impl block
-impl STAC {
+impl STACSTAC {
   // The constructor
   fn new(given_data: Vec<LabelBoolPoint>) -> self {
     // Generate the cluster IDs s.t. all points are seperate
