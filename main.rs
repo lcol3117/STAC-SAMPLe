@@ -17,7 +17,7 @@ trait STACModel {
   fn train(&mut self, eta: u32) -> option<Trained>,
   // Checks if a and b are in the same cluster
   // Takes a and b (points in a boolean space) as Vectors of booleans
-  // Returns Some(ConnectEnum) if self.trained is DoneEnum::done, otherwise None
+  // Returns Some(ConnectEnum) if self.result.job is TaskState::done, otherwise None
   // Its work is stored in the return, and must not mutate self
   // Note that a and b are Vec<bool> not LabelBoolPoint
   // This is because we do not use label information
@@ -59,15 +59,15 @@ impl STACModelConstructor for STAC {
 impl STACModel for STAC {
   // The train function, see STACModel
   fn train(&mut self, eta: u32) -> option<Trained> {
-    // Check that self.trained is TaskState::ready
+    // Check that self.result.job is TaskState::ready
     let result_return
-    if self.trained != TaskState::ready {
+    if self.result.job != TaskState::ready {
       return None // Return None
     }
     // Set that the train task is pending
-    self.trained = TaskState::pending;
+    self.result.job = TaskState::pending;
     // Iterate until deemed complete by STAC::training_iteration
-    while self.trained == TaskState::pending {
+    while self.result.job == TaskState::pending {
       // Need to pass on eta, it is not a property
       self.training_iteration(eta: u32); // Call STAC::training_iteration
     };
@@ -118,18 +118,18 @@ impl STACModel for STAC {
   
   // The update_data function, see STACModel
   fn update_data(&mut self, newdata: Vec<LabelBoolPoint>) {
-    // Await the self.trained TaskState to be not pending
-    while self.trained == TaskState::pending {};
-    // Set the self.trained TaskState to be pending
-    self.trained = TaskState::pending;
+    // Await the self.result.job TaskState to be not pending
+    while self.result.job == TaskState::pending {};
+    // Set the self.result.job TaskState to be pending
+    self.result.job = TaskState::pending;
     // Generate a new STAC object with the desired fields
     let new_STAC_object = STAC::new(newdata);
     // Update the data field
     self.data = new_STAC_object.data;
     // Update the result field
     self.result = new_STAC_object.result;
-    // Set self.trained TaskState to ready
-    self.trained = TaskState::ready;
+    // Set self.result.job TaskState to ready
+    self.result.job = TaskState::ready;
     // Implicitly return unit
   }
 }
