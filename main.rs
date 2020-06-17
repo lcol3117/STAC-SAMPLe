@@ -181,10 +181,18 @@ impl STAC {
       .position(|x| { // No reference, u64 implements the Copy trait
         x == min_dist // Find the position of the element that is min_dist
       }); // -> usize, so we can use as an index without a cast or usize::from
+    // Find the index of the next closest pair
+    let closest_index_alt = dists
+      .iter() // -> Iterator<u64>
+      .position(|x| { // No reference, u64 implements the Copy trait
+        x == min_dist_alt // Find the position of the element that is min_dist_alt
+      }); // -> usize, so we can use as an index without a cast or usize::from
     // Get the first point
     let datapoint_a = self.data[closest_index];
     // And then the other datapoint, as the Vec<bool> entry of the right tuple
     let datapoint_b = closest_vec[closest_index].0;
+    // And then the other datapoint, as the Vec<bool> entry of the other tuple
+    let datapoint_b_alt = closest_vec[closest_index_alt].0;
     // See if this connects two labeled boolean space points of the same label
     let merged_different = self.check_merging_labels(datapoint_a, datapoint_b);
     // Match against the returned ConnectEnum
@@ -193,15 +201,20 @@ impl STAC {
       ConnectEnum::seperate => self.connect_points(datapoint_a, datapoint_b),
       // Otherwise, check eta to see if we can try again
       ConnectEnum::linked => {
+        // Update attempted_failed with initial: (A,B), resolve: (A, B_ALT)
+        self.attempted_failed.push(NewLink<Vec<bool>> {
+          inital: (datapoint_a.clone().to_vec(), datapoint_b.clone().to_vec()),
+          resolve: (datapoint_a.clone().to_vec(), datapoint_b_alt.clone().to_vec())
+        });
         if eta != 0 {
-          // Update attempted_failed
-          self.attempted_failed.push(NewLink<Vec<bool>> {
-            inital: datapoint_a.clone().to_vec(),
-            resolve: datapoint_b.clone().to_vec()
-          })
-        }
-      }
-    }
+          // Recursively call STAC::attempt_connect_closest
+          self.attempt_connect_closest(eta - 1_u32); // Reduce eta: u32 by 1
+        } else {
+          // Nothing left to do except end the training proccess
+          self.result.job = TaskState::done;
+        };
+      };
+    };
   }
 }
 
