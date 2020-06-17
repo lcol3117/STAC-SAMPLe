@@ -2,6 +2,11 @@ fn main() {
   //TODO
 }
 
+// STAC stands for Semisupervised Ternary Agglomerative Clustering
+// It is usually Agglomerative Clustering where the exit condition is merging labels
+// Ternary state allows failure of one link to "try again" eta times
+// It takes only eta as a hyperparameter (not sure if labels count)
+
 trait STACModelConstructor {
   // The constructor itself
   // Takes the data to initialize with, a vector of labeled boolean space points
@@ -145,7 +150,7 @@ impl STAC {
 // Represent a potentially labeled point in boolean space
 struct LabelBoolPoint {
   point: Vec<bool>, // The point itself
-  label: option<LabelEnum> // Some(LabelEnum) if labeles, otherwise None
+  label: option<LabelEnum> // Some(LabelEnum) if labels, otherwise None
 }
 
 // Represent a job associated with a generic vector using TaskState
