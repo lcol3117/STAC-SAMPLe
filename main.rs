@@ -145,6 +145,8 @@ impl STAC {
   fn training_iteration(&mut self, eta: u32) {
     // TODO
   }
+  
+  // One iteration of STAC, needs to be seperate because it uses recursion
   fn attempt_connect_closest(&mut self, eta: u32) {
     // Set the current job state to pending
     self.result.job = TaskState::pending;
@@ -197,7 +199,7 @@ impl STAC {
     let merged_different = self.check_merging_labels(datapoint_a, datapoint_b);
     // Match against the returned ConnectEnum
     match merged_different {
-      // If they do not merge equivalent labels, connect them
+      // If that is all good, link them, connect_points uses attempted_failed
       ConnectEnum::seperate => self.connect_points(datapoint_a, datapoint_b),
       // Otherwise, check eta to see if we can try again
       ConnectEnum::linked => {
@@ -215,6 +217,7 @@ impl STAC {
         };
       };
     };
+    // Implicitly return Unit (())
   }
 }
 
