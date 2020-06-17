@@ -40,7 +40,7 @@ struct STAC {
 }
 
 // Constructor impl block
-impl STACSTAC {
+impl STACModelConstructor for STAC {
   // The constructor
   fn new(given_data: Vec<LabelBoolPoint>) -> self {
     // Generate the cluster IDs s.t. all points are seperate
