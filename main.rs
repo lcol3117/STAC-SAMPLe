@@ -141,6 +141,12 @@ struct LabelBoolPoint {
   label: option<LabelEnum> // Some(LabelEnum) if labeles, otherwise None
 }
 
+// Represent a job associated with a generic vector using TaskState
+struct VecJob<T> {
+  vector: Vec<T>,
+  job: TaskState
+}
+
 // Represent the labels used in SAMPLe
 enum LabelEnum {
   malware, // Malicious packages
