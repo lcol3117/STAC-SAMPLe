@@ -1,3 +1,13 @@
+// Use rayon for parallel map
+extern crate rayon;
+
+// Use bring rayon's traits into scope
+use rayon::prelude;
+use rayon::prelude::*;
+// Multithreading
+use std::thread;
+use std::thread::*;
+
 fn main() {
   //TODO
 }
