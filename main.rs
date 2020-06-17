@@ -143,17 +143,41 @@ impl STACModel for STAC {
 impl STAC {
   // Training iteration, called by STAC::train, an impl of STACModel trait
   fn training_iteration(&mut self, eta: u32) {
-    //TODO
+    // TODO
+  }
+  fn attempt_connect_closest(&mut self, eta: u32) {
     // Set the current job state to pending
     self.result.job = TaskState::pending;
     // Map each datapoint to the distance to the closest other in boolean space
-    let dists = self.data
+    let closest_vec = self.data
       .iter() // Convert to iterable
       .map(|&x| {
         // Returns a tuple of (point: Vec<bool>, distance: u64)
         Distance::closest_boolean_space(x.clone().to_vec(), self.data)
       })
       .collect::<Vec<(Vec<bool>, u64)>>(); // Iterator<_> -> Vec<_>
+    // Make a new vector of just the distance (u64) of the tuple
+    let dists = closest_vec
+      .iter() // Convert to iterable ( -> Iterator<u64> )
+      .map(|&x| {
+        x.1 // Access the second index (the u64) of the tuple (Vec<bool>, u64)
+      })
+      .collect::<Vec<u64>>(); // Iterator<u64> -> Vec<u64>, used turbofish
+    let min_dist = dists
+      .iter() // -> Iterator<u64>
+      .fold(|a, x| { // u64 implements the Copy trait, so no need for reference
+        if x < a {x} else {a} // Choose the minimum of either u64
+      });
+    // Find the index of the closest pair, i.e. the pair with minimum distance
+    let closest_index = dists
+      .iter() // -> Iterator<u64>
+      .position(|x| { // No reference, u64 implements the Copy trait
+        x == min_dist // Find the position of the element that is min_dist
+      }); // -> usize, so we can use as an index without a cast or usize::from
+    // Get the first point
+    let datapoint_a = self.data[closest_index];
+    // And then the other datapoint, as the Vec<bool> entry of the right tuple
+    let datapoint_b = closest_vec[closest_index].0;
   }
 }
 
