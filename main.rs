@@ -27,7 +27,7 @@ pub struct STAC {
   // Vector of points in a boolean space, some labeled, use LabelBoolPoint struct
   data: Vec<LabelBoolPoint>,
   // Job and Vector of cluster IDs
-  result: VecJob<u32>,
+  result: VecJob<option<u32>>,
   // Internal use only, attempted to link, failed, but ternary allowed alternate link
   attempted_failed: Vec<NewLink<Vec<bool>>>
 }
