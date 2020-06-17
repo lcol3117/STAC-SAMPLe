@@ -143,7 +143,7 @@ impl STACModel for STAC {
 impl STAC {
   // Training iteration, called by STAC::train, an impl of STACModel trait
   fn training_iteration(&mut self, eta: u32) {
-    // TODO
+    //TODO
   }
 }
 
