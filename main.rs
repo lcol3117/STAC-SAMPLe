@@ -26,8 +26,8 @@ pub trait STACModel {
 pub struct STAC {
   // Vector of points in a boolean space, use BooleanSpacePoint struct
   data: Vec<BooleanSpacePoint>,
-  // Vector of cluster IDs
-  result: Vec<u32>,
+  // Job and Vector of cluster IDs
+  result: VecJob<u32>,
   // Is the training done, ready, or pending
   trained: TaskState
 }
