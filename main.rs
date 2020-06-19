@@ -151,11 +151,11 @@ impl STAC {
     // Set the current job state to pending
     self.result.job = TaskState::pending;
     // Map each datapoint to the distance to the closest other in boolean space
-    let closest_vec = self.data_not_clustered
+    let closest_vec = self.data
       .iter() // Convert to iterable
       .map(|&x| {
         // Returns a tuple of (point: Vec<bool>, distance: u64)
-        let self.closest_seperate_clusters(x.clone().to_vec(), self.data);
+        let self.closest_seperate_clusters(x.clone().to_vec());
       })
       .collect::<Vec<(Vec<bool>, u64)>>(); // Iterator<_> -> Vec<_>
     // Make a new vector of just the distance (u64) of the tuple
@@ -218,6 +218,29 @@ impl STAC {
       };
     };
     // Implicitly return Unit (())
+  }
+  
+  // This function finds the closest point that does not share the same cluster id
+  fn closest_seperate_clusters(point: Vec<bool>) -> (Vec<bool>, u64) {
+    // Get the distances of every point in data to the point
+    let dists = self.data
+      .iter() // Iterator<_>
+      .map(|&x| {
+        Distance::boolean_space(x.clone().to_vec(), point.clone().to_vec()) // See Distance
+      })
+      .collect::<Vec<u64>>(); // Iterator<u64> -> Vec<u64> per Iterator<T> -> Vec<T>
+    // Find the minimum of dists as min_dist
+    let min_dist = dists
+      .iter() // Iterator<u64>, per _<T> (Vec<T>) -> Iterator<T>
+      .min() // Calculate the minimum, Vec<u64>::Item : Ord trait bound is satisfied
+      .unwrap(); // It returns option<T>, so unwrap because dists should not be empty
+    // Get the index of min_dist in dists
+    let min_dist_index = dists
+      .iter() // -> Iterator<_>
+      .position(|x| {e == min_dist}) // No reference, u64 implements the Copy trait
+      .unwrap(); // Assert it exists
+    // Return the min_dist_index element of data as the point, and min_dist as distance
+    (self.data[min_dist_index], min_dist)
   }
 }
 
